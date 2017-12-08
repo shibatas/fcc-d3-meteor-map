@@ -29,6 +29,7 @@ footer .fa {
     padding: 20px 0 0 0;
     text-align: center;
 }
-.chart {
-    display: inline-block;
+
+.bar rect {
+    fill: steelblue;
 }
