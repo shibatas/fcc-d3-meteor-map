@@ -48,15 +48,14 @@ function handleData(data) {
               "translate(" + margin.left + "," + margin.top + ")");
     
     // append the rectangles for the bar chart
-    svg.selectAll(".bar")
+    let bar = svg.selectAll(".bar")
       .data(data)
     .enter().append("rect")
       .attr("class", "bar")
       .attr("x", function(d) { return  x(d[0]); })
-      .attr("width", width/data.length-1)
+      .attr("width", width/data.length-0.5)
       .attr("y", function(d) { return y(d[1]); })
           .attr("height", function(d) { return height - y(d[1]); })
-      .style("fill", "steelblue");
     
     // add the x Axis
     svg.append("g")
@@ -66,15 +65,20 @@ function handleData(data) {
     // add the y Axis
     svg.append("g")
       .call(d3.axisLeft(y).ticks(5));
-}
-
-function filterDates(date) {
-    const year = date[0].split('-')[0];
-    const month = date[0].split('-')[1];
+      
+    //tooltip
+    let toolTip = d3.select(".contents").append("div").attr("class", "toolTip");
     
-    if ( year%10 === 0 && month === "01") {
-        return year;
-    } else {
-        return '.';
-    }
+    bar.on("mousemove", function(d){
+            const monthArr = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+            let date = monthArr[d[0].getMonth()] + '-' + (1900+d[0].getYear());
+            toolTip.style("left", d3.event.pageX+10+"px");
+            toolTip.style("top", d3.event.pageY-25+"px");
+            toolTip.style("display", "inline-block");
+            toolTip.html((date)+"<br>$"+(d[1])+"B");
+        });
+    bar.on("mouseout", function(d){
+            toolTip.style("display", "none");
+        });
+
 }
