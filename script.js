@@ -14,27 +14,28 @@ $.get(url, function(result) {
 
 function handleData(data) {
     const title = 'US GDP Over Time';
-    const parseTime = d3.timeParse("%m/%Y");
+    const subtitle = 'in Billions of US Dollars';
     
     data.forEach(function(d) {
        d[0] = new Date(d[0]); 
     });
     
-    console.log(data);
-    
-    d3.select(".title")
-        .append("h2")
+    let titleDiv = d3.select(".title");
+    titleDiv.append("h3")
         .html(title);
+    titleDiv.append("p")
+        .html(subtitle);
      
     const margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 960 - margin.left - margin.right,
+    width = 800 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
     // set the ranges
     const x = d3.scaleTime().range([0, width]);
     const y = d3.scaleLinear().range([height, 0]);
-            
-    console.log(x);
+    
+    x.domain(d3.extent(data, function(d) { return d[0]; }));
+    y.domain([0, d3.max(data, function(d) { return d[1]; })]);
               
     // append the svg object to the body of the page
     // append a 'group' element to 'svg'
@@ -51,19 +52,16 @@ function handleData(data) {
       .data(data)
     .enter().append("rect")
       .attr("class", "bar")
-      .attr("x", function(d) { return x(d[0]); })
-     // .attr("width", x.bandwidth())
+      .attr("x", function(d) { return  x(d[0]); })
+      .attr("width", width/data.length-1)
       .attr("y", function(d) { return y(d[1]); })
-          .attr("height", function(d) { return height - y(d[1]); });
+          .attr("height", function(d) { return height - y(d[1]); })
+      .style("fill", "steelblue");
     
     // add the x Axis
-    let xAxis = d3.axisBottom(x)
-        .tickFormat(d3.timeFormat("%m/%Y"))
-        .ticks(5);
-    
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+      .call(d3.axisBottom(x));
     
     // add the y Axis
     svg.append("g")

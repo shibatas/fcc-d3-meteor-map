@@ -23,13 +23,10 @@ footer .footer-icons {
 }
 footer .fa {
     margin: 0 20px 0 20px;
+    color: #222;
 }
 .contents {
     margin: auto;
     padding: 20px 0 0 0;
     text-align: center;
-}
-
-.bar rect {
-    fill: steelblue;
 }
