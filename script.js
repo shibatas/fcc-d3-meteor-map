@@ -1,5 +1,9 @@
 // tutorial url https://bost.ocks.org/mike/bar/2/
-const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json'
+
+/* global $ d3 */
+
+
+const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json';
 const chartHeight=0.5; //as percentage of viewport height
 const chartWidth=0.8; //as percentage of viewport width
 
