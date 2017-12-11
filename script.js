@@ -1,5 +1,10 @@
 /* global $ d3 */
 const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/cyclist-data.json';
+const svgWidth = $(window).width() > 1000 ? 700 : $(window).width()*0.8;  // width of plot area
+const svgHeight = svgWidth*2/3;  //height of plot area
+const legendLeft = ($(window).width() - svgWidth)/2 + svgWidth-200;
+
+console.log($(window).width() > 1000 ? 700 : $(window).width()*0.8 );
 
 $.get(url, function(result) {
     handleData(result);
@@ -16,34 +21,10 @@ function handleData(data) {
         .html(title);
     titleDiv.append("p")
         .html(subtitle);
-    titleDiv.append("small")
-        .append("span").attr("class", "red")
-        .append("span").html(": With doping allegations<br/>");
-    titleDiv.append("small")
-        .append("span").attr("class", "green")
-        .append("span").html(": No allegations");
-
-    d3.select(".green").insert("svg", ":first-child")
-        .attr("width", 10)
-        .attr("height", 10)
-      .append("circle")
-        .attr("r", 5)
-        .attr("cx", 5)
-        .attr("cy", 5)
-        .style("fill", "green");
-        
-    d3.select(".red").insert("svg", ":first-child")
-        .attr("width", 10)
-        .attr("height", 10)
-      .append("circle")
-        .attr("r", 5)
-        .attr("cx", 5)
-        .attr("cy", 5)
-        .style("fill", "red");
      
     const margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 700 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    width = svgWidth - margin.left - margin.right,
+    height = svgHeight - margin.top - margin.bottom;
 
     // set the ranges
     const x = d3.scaleTime().range([0, width]);
@@ -93,6 +74,33 @@ function handleData(data) {
     // add the y Axis
     svg.append("g")
       .call(yAxis);
+      
+    let legend = d3.select(".chart").append("div").attr("class", "legend");
+    legend.style("top", "-100px").style("left", legendLeft + 'px');
+    legend.append("small")
+        .append("span").attr("class", "red")
+        .append("span").html(" : With doping allegations<br/>");
+    legend.append("small")
+        .append("span").attr("class", "green")
+        .append("span").html(" : No allegations");
+
+    d3.select(".green").insert("svg", ":first-child")
+        .attr("width", 10)
+        .attr("height", 10)
+      .append("circle")
+        .attr("r", 5)
+        .attr("cx", 5)
+        .attr("cy", 5)
+        .style("fill", "green");
+        
+    d3.select(".red").insert("svg", ":first-child")
+        .attr("width", 10)
+        .attr("height", 10)
+      .append("circle")
+        .attr("r", 5)
+        .attr("cx", 5)
+        .attr("cy", 5)
+        .style("fill", "red");
       
     //tooltip
     let toolTip = d3.select(".contents").append("div").attr("class", "toolTip");

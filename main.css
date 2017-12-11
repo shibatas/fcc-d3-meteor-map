@@ -14,6 +14,10 @@ body {
     padding: 0;
 }
 footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
     text-align: center;
 }
 footer .footer-icons {
@@ -35,6 +39,10 @@ footer .fa {
     box-shadow: 3px 3px 3px #444;;
     margin: 10px;
     border-radius: 3px;
+}
+.legend {
+    position: relative;
+    text-align: left;
 }
 .toolTip {
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
