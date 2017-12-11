@@ -5,7 +5,7 @@ html {
 }
 header {
     background-color: #222;
-    color: #ddd;
+    color: #fff;
     text-align: center;
     padding: 5px 0 5px 0;
 }
@@ -29,6 +29,12 @@ footer .fa {
     margin: auto;
     padding: 20px 0 0 0;
     text-align: center;
+}
+.chart-area {
+    background-color: #fff;
+    box-shadow: 3px 3px 3px #444;;
+    margin: 10px;
+    border-radius: 3px;
 }
 .toolTip {
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;

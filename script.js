@@ -1,8 +1,5 @@
 /* global $ d3 */
 const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/cyclist-data.json';
-const chartHeight=0.5; //as percentage of viewport height
-const chartWidth=0.8; //as percentage of viewport width
-
 
 $.get(url, function(result) {
     handleData(result);
@@ -19,10 +16,34 @@ function handleData(data) {
         .html(title);
     titleDiv.append("p")
         .html(subtitle);
+    titleDiv.append("small")
+        .append("span").attr("class", "red")
+        .append("span").html(": With doping allegations<br/>");
+    titleDiv.append("small")
+        .append("span").attr("class", "green")
+        .append("span").html(": No allegations");
+
+    d3.select(".green").insert("svg", ":first-child")
+        .attr("width", 10)
+        .attr("height", 10)
+      .append("circle")
+        .attr("r", 5)
+        .attr("cx", 5)
+        .attr("cy", 5)
+        .style("fill", "green");
+        
+    d3.select(".red").insert("svg", ":first-child")
+        .attr("width", 10)
+        .attr("height", 10)
+      .append("circle")
+        .attr("r", 5)
+        .attr("cx", 5)
+        .attr("cy", 5)
+        .style("fill", "red");
      
     const margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 800 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = 700 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
 
     // set the ranges
     const x = d3.scaleTime().range([0, width]);
@@ -32,6 +53,7 @@ function handleData(data) {
     // append a 'group' element to 'svg'
     // moves the 'group' element to the top left margin
     let svg = d3.select(".chart").append("svg")
+        .attr("class", "chart-area")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
