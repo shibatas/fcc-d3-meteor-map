@@ -1,24 +1,20 @@
-// tutorial url https://bost.ocks.org/mike/bar/2/
-// another tutorial url https://bl.ocks.org/d3noob/bdf28027e0ce70bd132edc64f1dd7ea4
-
 /* global $ d3 */
-const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json';
-const chartHeight=0.5; //as percentage of viewport height
-const chartWidth=0.8; //as percentage of viewport width
+const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/cyclist-data.json';
+const svgWidth = $(window).width() > 1000 ? 700 : $(window).width()*0.8;  // width of plot area
+const svgHeight = svgWidth*2/3;  //height of plot area
+const legendLeft = ($(window).width() - svgWidth)/2 + svgWidth-200;
 
+console.log($(window).width() > 1000 ? 700 : $(window).width()*0.8 );
 
 $.get(url, function(result) {
-    handleData(result.data);
+    handleData(result);
 }, 'json')
     .fail(function(){ alert('error') });
 
 function handleData(data) {
-    const title = 'US GDP Over Time';
-    const subtitle = 'in Billions of US Dollars';
-    
-    data.forEach(function(d) {
-       d[0] = new Date(d[0]); 
-    });
+  console.log(data);
+    const title = "Tour de France: 35 Fastest times up Alpe d'Huez";
+    const subtitle = "Normalized to 13.8km distance";
     
     let titleDiv = d3.select(".title");
     titleDiv.append("h3")
@@ -27,58 +23,104 @@ function handleData(data) {
         .html(subtitle);
      
     const margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 800 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = svgWidth - margin.left - margin.right,
+    height = svgHeight - margin.top - margin.bottom;
 
     // set the ranges
     const x = d3.scaleTime().range([0, width]);
     const y = d3.scaleLinear().range([height, 0]);
-    
-    x.domain(d3.extent(data, function(d) { return d[0]; }));
-    y.domain([0, d3.max(data, function(d) { return d[1]; })]);
               
     // append the svg object to the body of the page
     // append a 'group' element to 'svg'
     // moves the 'group' element to the top left margin
     let svg = d3.select(".chart").append("svg")
+        .attr("class", "chart-area")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
         .attr("transform", 
               "translate(" + margin.left + "," + margin.top + ")");
+
+    x.domain([1993, 2016]);
+    y.domain([36.5, d3.max(data, function(d) { return d.Seconds/60; })]);
     
-    // append the rectangles for the bar chart
-    let bar = svg.selectAll(".bar")
-      .data(data)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return  x(d[0]); })
-      .attr("width", width/data.length-0.5)
-      .attr("y", function(d) { return y(d[1]); })
-          .attr("height", function(d) { return height - y(d[1]); })
+    // add the scatter plot
+    let dots = svg.selectAll("dot")
+        .data(data)
+      .enter().append("circle")
+        .attr("r", 5)
+        .attr("cx", function(d) { return x(d.Year); })
+        .attr("cy", function(d) { return y(d.Seconds/60); })
+        .style("fill", function(d) {
+          if (!d.Doping) {return "green";}
+          else {return "red";}
+        });
     
     // add the x Axis
+    const xAxis = d3.axisBottom(x)
+            .ticks(5)
+            .tickFormat(d3.format(.4));
+            
+    const yAxis = d3.axisLeft(y)
+            .ticks(5)
+            .tickFormat(function(d) {
+                return minutesAndSeconds(d)
+            });
+    
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
+      .call(xAxis);
     
     // add the y Axis
     svg.append("g")
-      .call(d3.axisLeft(y).ticks(5));
+      .call(yAxis);
+      
+    let legend = d3.select(".chart").append("div").attr("class", "legend");
+    legend.style("top", "-100px").style("left", legendLeft + 'px');
+    legend.append("small")
+        .append("span").attr("class", "red")
+        .append("span").html(" : With doping allegations<br/>");
+    legend.append("small")
+        .append("span").attr("class", "green")
+        .append("span").html(" : No allegations");
+
+    d3.select(".green").insert("svg", ":first-child")
+        .attr("width", 10)
+        .attr("height", 10)
+      .append("circle")
+        .attr("r", 5)
+        .attr("cx", 5)
+        .attr("cy", 5)
+        .style("fill", "green");
+        
+    d3.select(".red").insert("svg", ":first-child")
+        .attr("width", 10)
+        .attr("height", 10)
+      .append("circle")
+        .attr("r", 5)
+        .attr("cx", 5)
+        .attr("cy", 5)
+        .style("fill", "red");
       
     //tooltip
     let toolTip = d3.select(".contents").append("div").attr("class", "toolTip");
     
-    bar.on("mousemove", function(d){
-            const monthArr = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-            let date = monthArr[d[0].getMonth()] + '-' + (1900+d[0].getYear());
+    dots.on("mousemove", function(d){
             toolTip.style("left", d3.event.pageX+10+"px");
             toolTip.style("top", d3.event.pageY-25+"px");
             toolTip.style("display", "inline-block");
-            toolTip.html((date)+"<br>$"+(d[1])+"B");
+            toolTip.html((d.Name)+"<br>"+d.Time);
         });
-    bar.on("mouseout", function(d){
+    dots.on("mouseout", function(d){
             toolTip.style("display", "none");
         });
+}
 
+const minutesAndSeconds = (time) => {
+  let minutes = (Math.floor(time)).toString();
+  let seconds = ((time-minutes)*60).toString();
+                
+  if (seconds.length < 2) { seconds = '0' + seconds; }
+      
+  return minutes + ':' + seconds;
 }
