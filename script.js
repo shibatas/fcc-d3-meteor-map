@@ -1,24 +1,18 @@
-// tutorial url https://bost.ocks.org/mike/bar/2/
-// another tutorial url https://bl.ocks.org/d3noob/bdf28027e0ce70bd132edc64f1dd7ea4
-
 /* global $ d3 */
-const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json';
+const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/cyclist-data.json';
 const chartHeight=0.5; //as percentage of viewport height
 const chartWidth=0.8; //as percentage of viewport width
 
 
 $.get(url, function(result) {
-    handleData(result.data);
+    handleData(result);
 }, 'json')
     .fail(function(){ alert('error') });
 
 function handleData(data) {
-    const title = 'US GDP Over Time';
-    const subtitle = 'in Billions of US Dollars';
-    
-    data.forEach(function(d) {
-       d[0] = new Date(d[0]); 
-    });
+  console.log(data);
+    const title = 'Scatter Plot';
+    const subtitle = 'some subtitle here';
     
     let titleDiv = d3.select(".title");
     titleDiv.append("h3")
@@ -33,9 +27,6 @@ function handleData(data) {
     // set the ranges
     const x = d3.scaleTime().range([0, width]);
     const y = d3.scaleLinear().range([height, 0]);
-    
-    x.domain(d3.extent(data, function(d) { return d[0]; }));
-    y.domain([0, d3.max(data, function(d) { return d[1]; })]);
               
     // append the svg object to the body of the page
     // append a 'group' element to 'svg'
@@ -46,26 +37,32 @@ function handleData(data) {
       .append("g")
         .attr("transform", 
               "translate(" + margin.left + "," + margin.top + ")");
+
+    x.domain([1993, 2016]);
+    y.domain([36.5, d3.max(data, function(d) { return d.Seconds/60; })]);
     
-    // append the rectangles for the bar chart
-    let bar = svg.selectAll(".bar")
-      .data(data)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return  x(d[0]); })
-      .attr("width", width/data.length-0.5)
-      .attr("y", function(d) { return y(d[1]); })
-          .attr("height", function(d) { return height - y(d[1]); })
+    // add the scatter plot
+    svg.selectAll("dot")
+        .data(data)
+      .enter().append("circle")
+        .attr("r", 5)
+        .attr("cx", function(d) { return x(d.Year); })
+        .attr("cy", function(d) { return y(d.Seconds/60); });
     
     // add the x Axis
+    const xAxis = d3.axisBottom(x)
+            .ticks(5)
+            .tickFormat(d3.format(.4));
+    
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
+      .call(xAxis);
     
     // add the y Axis
     svg.append("g")
       .call(d3.axisLeft(y).ticks(5));
       
+    /*
     //tooltip
     let toolTip = d3.select(".contents").append("div").attr("class", "toolTip");
     
@@ -80,5 +77,6 @@ function handleData(data) {
     bar.on("mouseout", function(d){
             toolTip.style("display", "none");
         });
+    */
 
 }
