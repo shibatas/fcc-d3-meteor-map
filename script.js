@@ -11,8 +11,8 @@ $.get(url, function(result) {
 
 function handleData(data) {
   console.log(data);
-    const title = 'Scatter Plot';
-    const subtitle = 'some subtitle here';
+    const title = "Tour de France: 35 Fastest times up Alpe d'Huez";
+    const subtitle = "Normalized to 13.8km distance";
     
     let titleDiv = d3.select(".title");
     titleDiv.append("h3")
@@ -42,17 +42,27 @@ function handleData(data) {
     y.domain([36.5, d3.max(data, function(d) { return d.Seconds/60; })]);
     
     // add the scatter plot
-    svg.selectAll("dot")
+    let dots = svg.selectAll("dot")
         .data(data)
       .enter().append("circle")
         .attr("r", 5)
         .attr("cx", function(d) { return x(d.Year); })
-        .attr("cy", function(d) { return y(d.Seconds/60); });
+        .attr("cy", function(d) { return y(d.Seconds/60); })
+        .style("fill", function(d) {
+          if (!d.Doping) {return "green";}
+          else {return "red";}
+        });
     
     // add the x Axis
     const xAxis = d3.axisBottom(x)
             .ticks(5)
             .tickFormat(d3.format(.4));
+            
+    const yAxis = d3.axisLeft(y)
+            .ticks(5)
+            .tickFormat(function(d) {
+                return minutesAndSeconds(d)
+            });
     
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
@@ -60,23 +70,27 @@ function handleData(data) {
     
     // add the y Axis
     svg.append("g")
-      .call(d3.axisLeft(y).ticks(5));
+      .call(yAxis);
       
-    /*
     //tooltip
     let toolTip = d3.select(".contents").append("div").attr("class", "toolTip");
     
-    bar.on("mousemove", function(d){
-            const monthArr = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-            let date = monthArr[d[0].getMonth()] + '-' + (1900+d[0].getYear());
+    dots.on("mousemove", function(d){
             toolTip.style("left", d3.event.pageX+10+"px");
             toolTip.style("top", d3.event.pageY-25+"px");
             toolTip.style("display", "inline-block");
-            toolTip.html((date)+"<br>$"+(d[1])+"B");
+            toolTip.html((d.Name)+"<br>"+d.Time);
         });
-    bar.on("mouseout", function(d){
+    dots.on("mouseout", function(d){
             toolTip.style("display", "none");
         });
-    */
+}
 
+const minutesAndSeconds = (time) => {
+  let minutes = (Math.floor(time)).toString();
+  let seconds = ((time-minutes)*60).toString();
+                
+  if (seconds.length < 2) { seconds = '0' + seconds; }
+      
+  return minutes + ':' + seconds;
 }
