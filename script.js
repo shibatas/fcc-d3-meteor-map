@@ -1,5 +1,7 @@
+// http://bl.ocks.org/tjdecke/5558084
+
 /* global $ d3 */
-const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/cyclist-data.json';
+const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/global-temperature.json';
 const svgWidth = $(window).width() > 1000 ? 700 : $(window).width()*0.8;  // width of plot area
 const svgHeight = svgWidth*2/3;  //height of plot area
 const legendLeft = ($(window).width() - svgWidth)/2 + svgWidth-200;
@@ -13,9 +15,19 @@ $.get(url, function(result) {
 
 function handleData(data) {
   console.log(data);
-    const title = "Tour de France: 35 Fastest times up Alpe d'Huez";
-    const subtitle = "Normalized to 13.8km distance";
-    
+    const title = "Monthly Global Land-Surface Temperature";
+    const subtitle = "1753 - 2015";
+    let AxisValX = [];
+    let AxisValY = [];
+    let val = [];
+    data.monthlyVariance.forEach(function(item) {
+        AxisValX.push(item.year);
+        AxisValY.push(item.month);
+        val.push(item.variance);
+    });    
+
+    console.log(AxisValX, AxisValY, val);
+
     let titleDiv = d3.select(".title");
     titleDiv.append("h3")
         .html(title);
@@ -41,30 +53,24 @@ function handleData(data) {
         .attr("transform", 
               "translate(" + margin.left + "," + margin.top + ")");
 
-    x.domain([1993, 2016]);
-    y.domain([36.5, d3.max(data, function(d) { return d.Seconds/60; })]);
+    x.domain(d3.extent(AxisValX));
+    y.domain(d3.extent(AxisValY));
     
-    // add the scatter plot
-    let dots = svg.selectAll("dot")
-        .data(data)
-      .enter().append("circle")
-        .attr("r", 5)
-        .attr("cx", function(d) { return x(d.Year); })
-        .attr("cy", function(d) { return y(d.Seconds/60); })
-        .style("fill", function(d) {
-          if (!d.Doping) {return "green";}
-          else {return "red";}
-        });
-    
+    // heat map
+    const colors = ["#a50026","#d73027","#f46d43","#fdae61","#fee090","#e0f3f8","#abd9e9","#74add1","#4575b4","#313695"];
+    const colorScale = d3.scale.quantile()
+    .domain(d3.extent(val))
+    .range(colors);
+
+
     // add the x Axis
     const xAxis = d3.axisBottom(x)
-            .ticks(5)
+            .ticks(10)
             .tickFormat(d3.format(.4));
             
     const yAxis = d3.axisLeft(y)
-            .ticks(5)
             .tickFormat(function(d) {
-                return minutesAndSeconds(d)
+                return month(d)
             });
     
     svg.append("g")
@@ -74,33 +80,6 @@ function handleData(data) {
     // add the y Axis
     svg.append("g")
       .call(yAxis);
-      
-    let legend = d3.select(".chart").append("div").attr("class", "legend");
-    legend.style("top", "-100px").style("left", legendLeft + 'px');
-    legend.append("small")
-        .append("span").attr("class", "red")
-        .append("span").html(" : With doping allegations<br/>");
-    legend.append("small")
-        .append("span").attr("class", "green")
-        .append("span").html(" : No allegations");
-
-    d3.select(".green").insert("svg", ":first-child")
-        .attr("width", 10)
-        .attr("height", 10)
-      .append("circle")
-        .attr("r", 5)
-        .attr("cx", 5)
-        .attr("cy", 5)
-        .style("fill", "green");
-        
-    d3.select(".red").insert("svg", ":first-child")
-        .attr("width", 10)
-        .attr("height", 10)
-      .append("circle")
-        .attr("r", 5)
-        .attr("cx", 5)
-        .attr("cy", 5)
-        .style("fill", "red");
       
     //tooltip
     let toolTip = d3.select(".contents").append("div").attr("class", "toolTip");
@@ -116,11 +95,7 @@ function handleData(data) {
         });
 }
 
-const minutesAndSeconds = (time) => {
-  let minutes = (Math.floor(time)).toString();
-  let seconds = ((time-minutes)*60).toString();
-                
-  if (seconds.length < 2) { seconds = '0' + seconds; }
-      
-  return minutes + ':' + seconds;
+const month = (numMonth) => {
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    return months[numMonth-1];
 }
