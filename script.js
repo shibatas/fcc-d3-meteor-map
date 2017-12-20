@@ -76,7 +76,7 @@ const handleData = (data) => {
         .attr('height', gridHeight)
         .attr('y', function(d) { return y(d.month); })
         .attr('x', function(d) { return x(d.year); })
-        .attr('fill', 'yellow');
+        .attr('fill', '#eee');
 
     // add the x Axis
     const xAxis = d3.axisBottom(x)
