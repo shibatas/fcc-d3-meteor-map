@@ -35,10 +35,10 @@ footer .fa {
     text-align: center;
 }
 .chart-area {
-    background-color: #fff;
     box-shadow: 3px 3px 3px #444;;
     margin: 10px;
-    border-radius: 3px;
+    border-radius: 50%;
+    background: radial-gradient(blue, #222);
 }
 .legend {
     position: relative;
