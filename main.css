@@ -39,6 +39,7 @@ footer .fa {
     margin: 10px;
     border-radius: 50%;
     background: radial-gradient(blue, #222);
+    opacity: 0.9;
 }
 .legend {
     position: relative;

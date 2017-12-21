@@ -37,8 +37,8 @@ const handleData = (data) => {
             .attr("y1", function(d) { return d.source.y })
             .attr("x2", function(d) { return d.target.x })
             .attr("y2", function(d) { return d.target.y });
-        node.attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; });
+        node.attr("x", function(d) { return d.x-15; })
+            .attr("y", function(d) { return d.y-15; });
     }
 
     let titleDiv = d3.select(".title");
@@ -57,11 +57,12 @@ const handleData = (data) => {
         
     let node = svg.append("g")
           .attr("class", "nodes")
-        .selectAll("circle")
+        .selectAll("image")
         .data(data.nodes)
-        .enter().append("circle")
-          .attr("r", 5)
-          .attr("fill", "blue")
+        .enter().append("image")
+          .attr("width",30)
+          .attr("height", 30)
+          .attr("xlink:href", function(d){return "http://www.countryflags.io/"+d.code+"/flat/64.png"})
           .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
