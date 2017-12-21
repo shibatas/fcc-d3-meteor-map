@@ -1,3 +1,3 @@
-# fcc-d3-heatmap
+# fcc-d3-force-directed
 
-Project Description: <https://www.freecodecamp.org/challenges/visualize-data-with-a-heat-map>
+Project Description: <https://www.freecodecamp.org/challenges/show-national-contiguity-with-a-force-directed-graph>
