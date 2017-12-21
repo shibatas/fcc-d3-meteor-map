@@ -1,3 +1,3 @@
-# fcc-d3-force-directed
+# fcc-d3-meteor-map
 
-Project Description: <https://www.freecodecamp.org/challenges/show-national-contiguity-with-a-force-directed-graph>
+Project Description: <https://www.freecodecamp.org/challenges/map-data-across-the-globe>
