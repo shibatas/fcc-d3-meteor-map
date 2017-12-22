@@ -3,7 +3,7 @@
 $(document).ready(function() {
 
 /* global $ d3 */
-const url='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/meteorite-strike-data.json';
+const meteorUrl='https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/meteorite-strike-data.json';
 const svgWidth = $(window).width()*0.9;  // width of plot area
 const svgHeight = $(window).height()*0.75;  //height of plot area
 const title = "History of Meteor Landings";
@@ -24,7 +24,6 @@ let svg = d3.select(".chart").append("svg")
     .attr("class", "chart-area")
     .attr("width", svgWidth)
     .attr("height", svgHeight)
-    
 
 const mapUrl = "https://enjalot.github.io/wwsd/data/world/world-110m.geojson"
 
@@ -32,18 +31,30 @@ d3.json(mapUrl, function(error, geojson) {
     if (error) throw error;
     let map = svg.append("path")
         .attr("d", path(geojson))
-        .attr("fill", "green");
+        .attr("fill", "#ccc");
 
-    svg.selectAll("circle")
-        .data([[3,50],[0,0]])
+    d3.json(meteorUrl, function(error, result) {
+        if (error) throw error;
+        handleData(result, map);
+    });
+});
+        
+const handleData = (meteor, map) => {
+    console.log(meteor);
+    let dots = svg.selectAll("circle")
+        .data(meteor.features)
         .enter().append("circle")
-        .attr("cx", function(d) { console.log(projection(d)); return projection(d)[0]; })
-        .attr("cy", function(d) { return projection(d)[1]; })
-        .attr("r", 50)
-        .attr("fill", "red");
+        .attr("cx", function(d) { if (d.geometry) return projection(d.geometry.coordinates)[0]; })
+        .attr("cy", function(d) { if (d.geometry) return projection(d.geometry.coordinates)[1]; })
+        .attr("r", function(d) { if (d.geometry) return d.properties.mass > 10000 ? Math.sqrt(d.properties.mass)*0.01 : 1; })
+        .attr("fill", "red")
+        .attr("fill-opacity", 0.6)
+        .attr("stroke", "black")
+        .attr("stroke-width", 0.3);
 
     function zoomed() {
             map.attr("transform", d3.event.transform);
+            dots.attr("transform", d3.event.transform);
           }
         
     const zoom = d3.zoom()
@@ -52,33 +63,20 @@ d3.json(mapUrl, function(error, geojson) {
         .on("zoom", zoomed);
     
     svg.call(zoom);
-
-    
-    });
         
-
-$.get(url, function(result) {
-    handleData(result);
-}, 'json')
-    .fail(function(){ alert('error') });
-
-const handleData = (data) => {
-    console.log(data);
-    
-        /*
     //tooltip
     let toolTip = d3.select(".contents").append("div").attr("class", "toolTip");
     
-    node.on("mousemove", function(d){
+    dots.on("mousemove", function(d){
             toolTip.style("left", d3.event.pageX+10+"px");
             toolTip.style("top", d3.event.pageY-25+"px");
             toolTip.style("display", "inline-block");
-            toolTip.html( d.country );
+            toolTip.html( d.properties.name+", "+d.properties.mass );
         });
-    node.on("mouseout", function(d){
+    dots.on("mouseout", function(d){
             toolTip.style("display", "none");
         });
-    */
+    
 }
 
 });
