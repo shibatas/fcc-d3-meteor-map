@@ -18,7 +18,7 @@ titleDiv.append("p")
 const projection = d3.geoMercator()
     .scale(svgWidth/3)
     .translate([svgWidth, svgHeight]);
-const path = d3.geoPath().projection(projection);;
+const path = d3.geoPath().projection(projection);
 
 let svg = d3.select(".chart").append("svg")
     .attr("class", "chart-area")
@@ -26,12 +26,21 @@ let svg = d3.select(".chart").append("svg")
     .attr("height", svgHeight)
     
 
-const mapUrl = "http://enjalot.github.io/wwsd/data/world/world-110m.geojson"
+const mapUrl = "https://enjalot.github.io/wwsd/data/world/world-110m.geojson"
 
 d3.json(mapUrl, function(error, geojson) {
     if (error) throw error;
     let map = svg.append("path")
-        .attr("d", path(geojson));
+        .attr("d", path(geojson))
+        .attr("fill", "green");
+
+    svg.selectAll("circle")
+        .data([[3,50],[0,0]])
+        .enter().append("circle")
+        .attr("cx", function(d) { console.log(projection(d)); return projection(d)[0]; })
+        .attr("cy", function(d) { return projection(d)[1]; })
+        .attr("r", 50)
+        .attr("fill", "red");
 
     function zoomed() {
             map.attr("transform", d3.event.transform);
@@ -39,7 +48,7 @@ d3.json(mapUrl, function(error, geojson) {
         
     const zoom = d3.zoom()
         .scaleExtent([.4, 40])
-        .translateExtent([[-100, -100], [svgWidth + 1200, svgHeight + 500]])
+        .translateExtent([[0, -500], [svgWidth + 1400, svgHeight + 1000]])
         .on("zoom", zoomed);
     
     svg.call(zoom);

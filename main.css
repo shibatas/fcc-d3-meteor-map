@@ -35,7 +35,8 @@ footer .fa {
     text-align: center;
 }
 .chart-area {
-    box-shadow: 3px 3px 3px #444;;
+    background-color: #fff;
+    box-shadow: 3px 3px 3px #444;
     margin: 10px;
 }
 .legend {
