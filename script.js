@@ -16,8 +16,8 @@ titleDiv.append("p")
         .html(subtitle);
     
 const projection = d3.geoMercator()
-    .scale(svgWidth/3)
-    .translate([svgWidth, svgHeight]);
+    .scale(svgWidth/6)
+    .translate([svgWidth/2, svgHeight*.8]);
 const path = d3.geoPath().projection(projection);
 
 let svg = d3.select(".chart").append("svg")
@@ -46,7 +46,7 @@ const handleData = (meteor, map) => {
         .enter().append("circle")
         .attr("cx", function(d) { if (d.geometry) return projection(d.geometry.coordinates)[0]; })
         .attr("cy", function(d) { if (d.geometry) return projection(d.geometry.coordinates)[1]; })
-        .attr("r", function(d) { if (d.geometry) return d.properties.mass > 10000 ? Math.sqrt(d.properties.mass)*0.01 : 1; })
+        .attr("r", function(d) { if (d.geometry) return d.properties.mass > 25000 ? Math.sqrt(d.properties.mass)*0.01 : 2; })
         .attr("fill", "red")
         .attr("fill-opacity", 0.6)
         .attr("stroke", "black")
@@ -58,8 +58,8 @@ const handleData = (meteor, map) => {
           }
         
     const zoom = d3.zoom()
-        .scaleExtent([.4, 40])
-        .translateExtent([[0, -500], [svgWidth + 1400, svgHeight + 1000]])
+        .scaleExtent([1, 40])
+        .translateExtent([[0, 0], [svgWidth, svgHeight + 400]])
         .on("zoom", zoomed);
     
     svg.call(zoom);
@@ -71,7 +71,7 @@ const handleData = (meteor, map) => {
             toolTip.style("left", d3.event.pageX+10+"px");
             toolTip.style("top", d3.event.pageY-25+"px");
             toolTip.style("display", "inline-block");
-            toolTip.html( d.properties.name+", "+d.properties.mass );
+            toolTip.html( "<em>"+d.properties.name+"</em><br/>"+d.properties.year.slice(0,4)+"<br/>Mass: "+ d.properties.mass);
         });
     dots.on("mouseout", function(d){
             toolTip.style("display", "none");
